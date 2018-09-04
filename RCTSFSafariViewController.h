@@ -5,5 +5,7 @@
 
 @import SafariServices;
 
+FOUNDATION_EXPORT NSString *const kCloseSFController;
+
 @interface RCTSFSafariViewController : NSObject <RCTBridgeModule, SFSafariViewControllerDelegate>
 @end

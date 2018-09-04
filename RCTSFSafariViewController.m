@@ -1,5 +1,7 @@
 #import "RCTSFSafariViewController.h"
 
+NSString *const kCloseSFController = @"RCTSFSafariViewController/close";
+
 @implementation RCTSFSafariViewController
 
 @synthesize bridge = _bridge;
@@ -8,6 +10,7 @@ RCT_EXPORT_MODULE();
 
 - (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
   [self.bridge.eventDispatcher sendAppEventWithName:@"SFSafariViewControllerDismissed" body:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 RCT_EXPORT_METHOD(openURL:(NSString *)urlString params:(NSDictionary *)params) {
@@ -39,6 +42,11 @@ RCT_EXPORT_METHOD(openURL:(NSString *)urlString params:(NSDictionary *)params) {
       [self.bridge.eventDispatcher sendDeviceEventWithName:@"SFSafariViewControllerDidLoad" body:nil];
     }];
   });
+    
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                        selector:@selector(handleNotification:)
+                                        name:kCloseSFController
+                                        object:nil];
 }
 
 RCT_EXPORT_METHOD(close) {
@@ -46,6 +54,11 @@ RCT_EXPORT_METHOD(close) {
       UIViewController *rootViewController = [[[UIApplication sharedApplication] delegate] window].rootViewController;
       [rootViewController dismissViewControllerAnimated:YES completion:nil];
     });
+}
+
+- (void)handleNotification:(NSNotification *)notification {
+    [self close];
+    [self safariViewControllerDidFinish:NULL];
 }
 
 @end
